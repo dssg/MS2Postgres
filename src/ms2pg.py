@@ -87,7 +87,7 @@ class Mover:
             records_processed += 1
             if records_processed % self.__commit_freq == 0:
                 to_cursor.commit()
-                __log("Moved {} rows\n".format(records_processed))
+                self.__log("Moved {} rows\n".format(records_processed))
         to_cursor.commit()
         self.__log('Complete: moved {} rows.'.format(records_processed))
         self.__log('')

@@ -23,23 +23,26 @@ mappings = {'BINARY(n)': 'BYTEA',
             'VARBINARY(n)': 'BYTEA',
             'VARCHAR(max)': 'TEXT'}
 
-to_convert_filename = sys.argv[1]
-out_filename = sys.argv[2]
-
 
 def replace_all(string, mappings):
     s = ''.join(string).upper()
     # Remove [, ], K12INTEL_DW and the . from input file
-    s = s.replace('[K12INTEL_DW].', '').replace('ON [K12INTEL_DW_DATA]', '')
     s = s.replace('[', '').replace(']', '')
+    s = s.split('.')[1]
     # Map MSSQL types to PGSQL types
     for mssql, pgsql in mappings.iteritems():
         s = s.replace(mssql, pgsql)
     return s
 
-with open(to_convert_filename) as f:
-    text = f.readlines()
-    converted = replace_all(text, mappings)
-    outfile = open(out_filename, 'wb+')
-    outfile.write(converted)
-    outfile.close()
+
+if __name__ == '__main__':
+
+    to_convert_filename = sys.argv[1]
+    out_filename = sys.argv[2]
+
+    with open(to_convert_filename) as f:
+        text = f.readlines()
+        converted = replace_all(text, mappings)
+        outfile = open(out_filename, 'wb+')
+        outfile.write(converted)
+        outfile.close()

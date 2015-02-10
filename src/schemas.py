@@ -1,5 +1,12 @@
-# Using http://www.sqlines.com/sql-server-to-postgresql
-# Usage: python mssql_to_postgresql.py <<input file>> <<output file>>
+"""mssql to postgresql table schema conversion
+
+   Description:
+   Given a .sql file containing table creation schemas in MS SQL, 
+   converts the syntax and maps the data types to PostgreSQL.
+   
+   Using http://www.sqlines.com/sql-server-to-postgresql
+   Usage: python schemas.py <<input file>> <<output file>>
+"""
 
 import sys
 mappings = {'BINARY(n)': 'BYTEA',
@@ -25,8 +32,19 @@ mappings = {'BINARY(n)': 'BYTEA',
 
 
 def replace_all(string, mappings):
+    """Converts SQL Server schema to PostgreSQL schema
+
+    arguments:
+    string -- SQL Server schema
+    mappings -- dictionary where the key is the SQL Server datatype and the
+        value is the PostgreSQL datatype.
+    
+    returns:
+    PostgreSQL schema as string
+    """
+
     s = ''.join(string).upper()
-    # Remove [, ], K12INTEL_DW and the . from input file
+    # Remove [, ], the owner qualifier, and the . from input file
     s = s.replace('[', '').replace(']', '')
     s = s.split('.')[1]
     # Map MSSQL types to PGSQL types

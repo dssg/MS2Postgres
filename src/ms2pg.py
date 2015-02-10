@@ -2,11 +2,30 @@ import pyodbc
 import sys
 import os
 import time
-from mssql_to_postgresql import mappings, replace_all as convert_schema
+from schemas import mappings, replace_all as convert_schema
 
 class Mover:
+    """Object to move tables between two databases. 
+
+    Keeps track of the two database connections, the log file, and the
+    commit frequency.
+    """
+
+
     def __init__(self, ms_con_str, pgres_con_str, log_file = None, 
         commit_freq = 1000):
+        """initializer
+
+        arguments:
+        ms_con_str -- string to connect to SQL Server database
+        pgres_con_str -- string to connect to PostgreSQL database
+        log_file -- path of file to log transactions. Use None to turn off
+           logging.
+        commit_freq -- number of rows to move before committing and logging
+            each transaction
+        
+        """      
+
         self.__cxn_ms = pyodbc.connect(ms_con_str)
         self.__cxn_pgres = pyodbc.connect(pgres_con_str)
         if log_file is not None:
@@ -55,12 +74,12 @@ class Mover:
     def move_table(self, ms_table_name, ordr_col, ms_schema = None):
         """Moves a table from SQL Server to Postgres server
 
-           arguments:
-           ms_table_name -- The name of the table in SQL Server
-           ordr_col -- Column used to order the table. This is important
-                       if the move gets interrupted and you need to restart
-                       from the middle
-           ms_schema -- Query that SQL server uses to create table
+        arguments:
+        ms_table_name -- The name of the table in SQL Server
+        ordr_col -- Column used to order the table. This is important
+                    if the move gets interrupted and you need to restart
+                    from the middle
+        ms_schema -- Query that SQL server uses to create table
 
         """   
         #TODO use ROW_NUMBER() so we can start later in the table
@@ -98,8 +117,4 @@ if __name__ == '__main__':
 
     m = Mover(sys.argv[1], sys.argv[2], 'ms2pg.log')
     m.move_table(sys.argv[3], sys.argv[4])    
-
-#m = Mover('DSN=ZACHS_SQLEXPRESS', 'DSN=PostgreSQL30', 'log.txt')
-#m.move_table('employees', 'id')
-                
 
